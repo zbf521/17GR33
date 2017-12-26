@@ -1,0 +1,111 @@
+create database aa
+
+create table student(
+sid int primary key identity(1,1),
+snam nvarchar(20) not null check(len(snam)>1),
+sex nvarchar(1) not null ,
+class nvarchar(10) null,
+city nvarchar(20) null
+)
+
+create table course(
+cid int primary key identity(1,1),
+snam nvarchar(20) not null unique
+)
+create table score(
+scid int primary key identity(1,1),
+sid int not null foreign key references student(sid),
+cid int not null foreign key references course(cid),
+score decimal(5,1)
+)
+
+
+insert into student values('小凡','男','二班','许昌')
+insert into student values('小李','男','二班','许昌')
+insert into student values('小胡','男','二班','许昌')
+insert into student values('小狗','男','二班','许昌')
+insert into student values('小樊','男','二班','许昌')
+insert into student values('小郭','男','二班','许昌')
+insert into student values('小赵','男','二班','许昌')
+insert into student values('小赵','男','二班','许昌')
+
+
+insert into course values('java')
+insert into course values('Ps')
+insert into course values('SQL')
+insert into course values('C++')
+
+insert into score values(1,1,86)
+insert into score values(1,2,87)
+insert into score values(1,3,88)
+insert into score values(1,4,89)
+insert into score values(2,1,85)
+insert into score values(3,2,94)
+insert into score values(4,3,76)
+insert into score values(5,4,93)
+
+update student set  sex='女' where sid=2
+update student set  sex='女' where sid=4
+update student set  sex='女' where sid=6
+update student set  class='三班' where sid=2
+update student set  class='四班' where sid=4
+update student set  class='五班' where sid=6
+update student set  city='周口' where sid=2
+update student set  city='信阳' where sid=3
+update student set  city='新乡' where sid=4
+update student set  city='长葛' where sid=6
+
+delete from student where sid=8
+
+select *from student
+
+select *from student where sex='男'
+
+select *from score order by score asc
+select *from score where cid=1 order by score desc
+
+select *from student where city between '许昌' and '周口'
+select *from student where city in('许昌','周口')
+
+select distinct(city) from student
+
+select *from student where snam like '小_' 
+
+select MAX(score) from score where cid=1
+select min(score) from score where cid=1
+select avg(score) from score where cid=1
+
+select AVG(score) from score where sid=1
+
+select cid,COUNT(sid),MAX(score),MIN(score),AVG(score) from score group by cid 
+
+select cid,AVG(score) from score group by cid having  AVG(score)>75
+
+
+
+
+
+
+--查询和小凡在同一班级的学员
+select class from student where snam='小凡'
+select *from student
+select *from student where class=(select class from student where snam='小凡')
+
+--查询java的最高成绩
+select cid from course where snam='java'
+select max(score)from score where cid=(select cid from course where snam='java')
+
+--查询参加过考试的学员名单
+select sid from score 
+select snam from student  where sid in(select sid from score )
+
+--查询参加java的考试名单
+select cid from course  where snam='java'
+select sid from score where cid=(select cid from course  where snam='java')
+select snam from student  where sid in(select sid from score where cid=(select cid from course  where snam='java'))
+
+--查询java的最高的学员信息
+select cid from course where snam ='java'
+select MAX(score) from score where cid=(select cid from course where snam ='java')
+select sid from score where cid=(select cid from course where snam ='java')
+select *from student where sid=(select sid from score where cid=(select cid from course where snam ='java') and score=(select MAX(score) from score where cid=(select cid from course where snam ='java')))
